@@ -13,10 +13,11 @@ export function AboutUsPage() {
         <div className="lg:col-span-8">
           <p className="text-xs font-bold text-[#FF4D8D]">Our Story</p>
           <h1 className="mt-1.5 text-3xl font-extrabold text-[#3B0764] sm:text-4xl">
-            GiftKart — Har Gift Mein Ek Kahani.
+            {settings?.pageContent?.aboutHeadline || 'GiftKart — Har Gift Mein Ek Kahani.'}
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-[#4B2C70]">
-            Crafted for thoughtful gift-givers in <strong>Durgapur and Kolkata, India</strong>, GiftKart brings together 15 dedicated gifting categories—including personalized Coffee Mugs, custom T-shirt Prints, illuminated Photo Frames, handmade surprises, and boutique Gift Wrapping.
+            {settings?.pageContent?.aboutStory ||
+              'Crafted for thoughtful gift-givers in Jalchak, West Bengal, India, GiftKart brings together 15 dedicated gifting categories—including personalized Coffee Mugs, custom T-shirt Prints, illuminated Photo Frames, handmade surprises, and boutique Gift Wrapping.'}
           </p>
         </div>
         <div className="flex justify-center lg:col-span-4">
@@ -45,7 +46,7 @@ export function AboutUsPage() {
           <p className="mt-2 text-sm leading-relaxed text-[#594A6B]">
             Our initial operations focus exclusively on{' '}
             <strong>
-              {settings?.deliveryZones.map((z) => z.name).join(' and ') ?? 'Durgapur and Kolkata'}
+              {settings?.deliveryZones.map((z) => z.name).join(' and ') ?? 'Jalchak'}
             </strong>{' '}
             in West Bengal with transparent INR pricing and dedicated local dispatch.
           </p>
@@ -90,20 +91,20 @@ export function ContactUsPage() {
       <div className="gk-promo-gradient space-y-5 rounded-3xl border border-[#EBD8FF] p-6 sm:p-8 lg:col-span-5">
         <h1 className="text-3xl font-extrabold text-[#3B0764]">Contact GiftKart</h1>
         <p className="text-sm text-[#4B2C70]">
-          Questions about custom photo printing, bulk corporate gifts, or Durgapur &amp; Kolkata delivery? Reach out below.
+          Questions about custom photo printing, bulk corporate gifts, or Jalchak delivery? Reach out below.
         </p>
         <div className="space-y-3 text-sm font-semibold text-[#2B0B4E]">
           <p className="flex items-center gap-2.5">
             <MapPin className="h-4 w-4 text-[#FF4D8D]" />
-            <span>Durgapur &amp; Kolkata, West Bengal, India</span>
+            <span>Jalchak, West Bengal, India</span>
           </p>
           <p className="flex items-center gap-2.5">
             <Mail className="h-4 w-4 text-[#6A11CB]" />
-            <span>{settings?.supportEmail ?? 'hello@giftkart.in'}</span>
+            <span>{settings?.supportEmail ?? 'demo@giftkart.in'}</span>
           </p>
           <p className="flex items-center gap-2.5">
             <Phone className="h-4 w-4 text-[#6A11CB]" />
-            <span>{settings?.supportPhone ?? '+91 98300 00142'}</span>
+            <span>{settings?.supportPhone ?? '+91 9382040746'}</span>
           </p>
         </div>
       </div>
@@ -154,7 +155,7 @@ export function ContactUsPage() {
 const FAQ_ITEMS = [
   {
     q: 'Where does GiftKart currently deliver?',
-    a: 'For our initial launch, GiftKart delivers exclusively in Durgapur and Kolkata, West Bengal (India). Additional zones can be enabled from the Admin Panel as operations expand.',
+    a: 'For our initial launch, GiftKart delivers exclusively in Jalchak, West Bengal (India). Additional zones can be enabled from the Admin Panel as operations expand.',
   },
   {
     q: 'How does Gift Wrapping work?',
@@ -179,7 +180,7 @@ export function FaqPage() {
           Frequently Asked Questions
         </h1>
         <p className="mt-1.5 text-sm text-[#4B2C70]">
-          Everything about customization, gift wrapping, Durgapur &amp; Kolkata delivery, and Demo Order mode.
+          Everything about customization, gift wrapping, Jalchak delivery, and Demo Order mode.
         </p>
       </div>
 
@@ -214,20 +215,20 @@ export function FaqPage() {
 }
 
 const POLICY_CONTENT: Record<
-  'shipping' | 'return' | 'privacy' | 'terms',
+  'shipping' | 'return' | 'cancellation' | 'privacy' | 'terms',
   { title: string; subtitle: string; sections: { heading: string; body: string }[] }
 > = {
   shipping: {
     title: 'Shipping Policy',
-    subtitle: 'Durgapur & Kolkata Dispatch Guidelines',
+    subtitle: 'Jalchak Dispatch Guidelines',
     sections: [
       {
-        heading: 'Serviceable Delivery Areas',
-        body: 'Initial delivery coverage includes Durgapur and Kolkata, West Bengal. Delivery charges and free-delivery thresholds are displayed transparently at checkout in INR (₹).',
+        heading: 'Serviceable Delivery Area',
+        body: 'Initial delivery coverage includes Jalchak, West Bengal. Delivery charges and free-delivery thresholds are displayed transparently at checkout in INR (₹).',
       },
       {
         heading: 'Personalization Lead Time',
-        body: 'Custom printed mugs, T-shirts, and engraved LED photo frames require quality inspection before dispatch. Standard local delivery takes 1–3 business days depending on your zone.',
+        body: 'Custom printed mugs, T-shirts, and engraved LED photo frames require quality inspection before dispatch. Standard local delivery takes 1–2 business days in Jalchak.',
       },
     ],
   },
@@ -241,7 +242,21 @@ const POLICY_CONTENT: Record<
       },
       {
         heading: 'Non-Personalized Accessories & Gift Boxes',
-        body: 'Unused, unopened standard gift boxes, bags, and accessories may be requested for exchange within 7 days of delivery in Durgapur and Kolkata.',
+        body: 'Unused, unopened standard gift boxes, bags, and accessories may be requested for exchange within 7 days of delivery in Jalchak.',
+      },
+    ],
+  },
+  cancellation: {
+    title: 'Cancellation Policy',
+    subtitle: 'Pre-Production & Custom Order Cancellation Rules',
+    sections: [
+      {
+        heading: 'Standard Non-Personalized Orders',
+        body: 'Standard gifts and accessories can be cancelled anytime before dispatch from our Jalchak fulfillment desk.',
+      },
+      {
+        heading: 'Personalized & Custom-Printed Gifts',
+        body: 'Custom mugs, printed T-shirts, and engraved LED photo frames can be cancelled within 2 hours of order confirmation before printing or engraving begins. In Demo Mode, status updates can be tested directly inside the Admin Panel.',
       },
     ],
   },
@@ -278,7 +293,7 @@ const POLICY_CONTENT: Record<
 export function PolicyPage({
   type,
 }: {
-  type: 'shipping' | 'return' | 'privacy' | 'terms';
+  type: 'shipping' | 'return' | 'cancellation' | 'privacy' | 'terms';
 }) {
   const content = POLICY_CONTENT[type];
   return (

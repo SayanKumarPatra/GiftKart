@@ -6,7 +6,6 @@ import {
   Menu,
   Search,
   ShoppingCart,
-  User,
   X,
 } from 'lucide-react';
 import { BrandLogo } from '../ui/BrandLogo';
@@ -31,22 +30,22 @@ export function MobileHeader({ onOpenSearch }: MobileHeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-15 items-center justify-between border-b border-[#EBD8FF]/90 bg-white/95 px-3 backdrop-blur-xl lg:hidden">
-        <div className="flex items-center gap-1.5">
+      <header className="sticky top-0 z-40 flex h-[52px] items-center justify-between border-b border-[#EBD8FF]/90 bg-white/95 px-2.5 backdrop-blur-xl lg:hidden">
+        <div className="flex min-w-0 items-center gap-1">
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="flex h-11 w-11 items-center justify-center rounded-xl text-[#2B0B4E] hover:bg-[#F8F2FF]"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#2B0B4E] hover:bg-[#F8F2FF]"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <Link to="/" aria-label="GiftKart Home">
+          <Link to="/" aria-label="GiftKart Home" className="min-w-0">
             <BrandLogo size="sm" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-0.5">
+        <div className="flex shrink-0 items-center gap-0.5">
           <button
             type="button"
             onClick={onOpenSearch}
@@ -73,21 +72,13 @@ export function MobileHeader({ onOpenSearch }: MobileHeaderProps) {
             type="button"
             onClick={openCartDrawer}
             aria-label={`Cart (${itemCount})`}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#2B0B4E] hover:bg-[#F8F2FF]"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#6A11CB] hover:bg-[#F8F2FF]"
           >
-            <ShoppingCart className="h-5 w-5 text-[#6A11CB]" />
+            <ShoppingCart className="h-5 w-5" />
             <span className="absolute right-0.5 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#FF4D8D] px-1 font-mono text-[9px] font-bold tabular-nums text-white">
               {itemCount}
             </span>
           </button>
-
-          <Link
-            to="/account"
-            aria-label="Login or Account"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-[#6A11CB] hover:bg-[#F8F2FF]"
-          >
-            <User className="h-5 w-5" />
-          </Link>
         </div>
       </header>
 
@@ -99,7 +90,7 @@ export function MobileHeader({ onOpenSearch }: MobileHeaderProps) {
             onClick={() => setMenuOpen(false)}
           />
           <div className="relative flex h-full w-full max-w-xs flex-col border-r border-[#EBD8FF] bg-white">
-            <div className="flex h-15 items-center justify-between border-b border-[#EBD8FF] px-4">
+            <div className="flex h-[58px] items-center justify-between border-b border-[#EBD8FF] px-4">
               <BrandLogo size="sm" />
               <button
                 type="button"
@@ -117,17 +108,19 @@ export function MobileHeader({ onOpenSearch }: MobileHeaderProps) {
                   { label: 'Home', to: '/' },
                   { label: 'Shop All Gifts', to: '/shop' },
                   { label: 'Customize Gifts', to: '/customize' },
+                  { label: 'Customization Guide', to: '/customization-guide' },
                   { label: 'Best Sellers', to: '/best-sellers' },
                   { label: 'Accessories', to: '/category/personalized-accessories' },
                   { label: 'Track Order', to: '/track-order' },
                   { label: 'My Orders', to: '/my-orders' },
+                  { label: 'Saved Addresses', to: '/addresses' },
                   { label: 'About Us', to: '/about' },
                   { label: 'Contact Us', to: '/contact' },
                 ].map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="flex min-h-[42px] items-center justify-between rounded-xl px-3 text-sm font-semibold text-[#2B0B4E] hover:bg-[#F8F2FF] hover:text-[#6A11CB]"
+                    className="flex min-h-[40px] items-center justify-between rounded-xl px-3 text-sm font-semibold text-[#2B0B4E] hover:bg-[#F8F2FF] hover:text-[#6A11CB]"
                   >
                     <span>{link.label}</span>
                     <ChevronRight className="h-4 w-4 text-[#8B7AA0]" />
@@ -154,7 +147,7 @@ export function MobileHeader({ onOpenSearch }: MobileHeaderProps) {
                         <div className="flex items-center justify-between rounded-xl px-3 hover:bg-[#F8F2FF]">
                           <Link
                             to={`/category/${cat.slug}`}
-                            className="flex min-h-[40px] flex-1 items-center text-sm font-medium text-[#2B0B4E]"
+                            className="flex min-h-[38px] flex-1 items-center text-sm font-medium text-[#2B0B4E]"
                           >
                             {cat.name}
                           </Link>
@@ -179,7 +172,7 @@ export function MobileHeader({ onOpenSearch }: MobileHeaderProps) {
                               <Link
                                 key={sub.id}
                                 to={`/shop?category=${cat.slug}&subcategory=${sub.slug}`}
-                                className="flex min-h-[36px] items-center text-xs font-medium text-[#594A6B] hover:text-[#FF4D8D]"
+                                className="flex min-h-[34px] items-center text-xs font-medium text-[#594A6B] hover:text-[#FF4D8D]"
                               >
                                 {sub.name}
                               </Link>

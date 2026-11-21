@@ -5,6 +5,7 @@ export type StoreEventTopic =
   | 'settings'
   | 'coupons'
   | 'auth'
+  | 'community'
   | 'all';
 
 type Listener = (topic: StoreEventTopic) => void;

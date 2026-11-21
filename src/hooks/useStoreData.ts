@@ -6,8 +6,11 @@ import type {
   Coupon,
   DemoOrder,
   GiftWrapConfig,
+  NewsletterSubscriber,
   Product,
   ProductFilterParams,
+  ProductReview,
+  SavedAddress,
   StoreSettings,
 } from '../types';
 
@@ -60,6 +63,7 @@ const GIFT_WRAP_TOPICS: StoreEventTopic[] = ['giftWrap'];
 const SETTINGS_TOPICS: StoreEventTopic[] = ['settings'];
 const ORDER_TOPICS: StoreEventTopic[] = ['orders'];
 const COUPON_TOPICS: StoreEventTopic[] = ['coupons'];
+const COMMUNITY_TOPICS: StoreEventTopic[] = ['community'];
 
 export function useCategories(includeInactive = false): AsyncState<Category[]> {
   const fetcher = useCallback(
@@ -96,4 +100,22 @@ export function useOrders(): AsyncState<DemoOrder[]> {
 export function useCoupons(): AsyncState<Coupon[]> {
   const fetcher = useCallback(() => services.promotions.listCoupons(), []);
   return useAsyncStoreResource(fetcher, [], COUPON_TOPICS);
+}
+
+export function useSavedAddresses(): AsyncState<SavedAddress[]> {
+  const fetcher = useCallback(() => services.community.listSavedAddresses(), []);
+  return useAsyncStoreResource(fetcher, [], COMMUNITY_TOPICS);
+}
+
+export function useProductReviews(productId?: string): AsyncState<ProductReview[]> {
+  const fetcher = useCallback(
+    () => services.community.listReviews(productId),
+    [productId]
+  );
+  return useAsyncStoreResource(fetcher, [], COMMUNITY_TOPICS);
+}
+
+export function useNewsletterSubscribers(): AsyncState<NewsletterSubscriber[]> {
+  const fetcher = useCallback(() => services.community.listNewsletterSubscribers(), []);
+  return useAsyncStoreResource(fetcher, [], COMMUNITY_TOPICS);
 }

@@ -576,7 +576,7 @@ export function AdminCustomersPage() {
         email: customerAccount.email,
         fullName: customerAccount.fullName,
         phone: customerAccount.phone,
-        city: 'Durgapur / Kolkata',
+        city: 'Jalchak',
         orderCount: 0,
         totalSpentInr: 0,
       });
@@ -750,7 +750,7 @@ export function AdminReportsPage() {
 }
 
 /* ============================================================================
- * 5. ADMIN STORE SETTINGS & EDITABLE DELIVERY ZONES (DURGAPUR & KOLKATA)
+ * 5. ADMIN STORE SETTINGS & EDITABLE DELIVERY ZONES (JALCHAK)
  * ========================================================================== */
 export function AdminSettingsPage() {
   const { data: settings } = useStoreSettings();
@@ -817,7 +817,7 @@ export function AdminSettingsPage() {
             Store Settings &amp; Delivery Zones
           </h1>
           <p className="text-xs text-[#5F4B78]">
-            Initial launch zones are strictly Durgapur and Kolkata. You may edit rates or add future zones here.
+            Initial launch zone is strictly Jalchak, West Bengal. You may edit rates or add future zones here.
           </p>
         </div>
 
@@ -827,7 +827,7 @@ export function AdminSettingsPage() {
           variant="glass"
           onClick={() => {
             resetAllDemoSeedData();
-            pushToast({ title: 'Default Durgapur & Kolkata seed restored', variant: 'info' });
+            pushToast({ title: 'Default Jalchak seed restored', variant: 'info' });
           }}
         >
           <RefreshCw className="h-3.5 w-3.5" />
@@ -1003,7 +1003,7 @@ export function AdminIntegrationsPage() {
       name: 'WhatsApp Business API',
       status: services.whatsapp.statusLabel,
       summary:
-        'Prepared for automated order confirmation and delivery status template updates for Durgapur & Kolkata customers.',
+        'Prepared for automated order confirmation and delivery status template updates for Jalchak customers.',
     },
     {
       name: 'Email Notifications',

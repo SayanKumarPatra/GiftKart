@@ -42,7 +42,7 @@ export class LocalCustomerAuthService implements ICustomerAuthService {
       fullName,
       email,
       phone: input.phone.trim(),
-      defaultCity: input.defaultCity || 'Durgapur',
+      defaultCity: input.defaultCity || 'Jalchak',
       isDemoMode: true,
       signedInAt: new Date().toISOString(),
     };

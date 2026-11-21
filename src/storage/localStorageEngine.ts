@@ -1,6 +1,6 @@
 import { storeEvents, type StoreEventTopic } from './storeEvents';
 
-export const STORAGE_SCHEMA_VERSION = 'v2';
+export const STORAGE_SCHEMA_VERSION = 'v5';
 const STORAGE_PREFIX = `giftkart:${STORAGE_SCHEMA_VERSION}:`;
 
 export const STORAGE_KEYS = {
@@ -15,6 +15,9 @@ export const STORAGE_KEYS = {
   WISHLIST_IDS: `${STORAGE_PREFIX}wishlist_ids`,
   CUSTOMER_DEMO_ACCOUNT: `${STORAGE_PREFIX}customer_demo_account`,
   ADMIN_DEMO_SESSION: `${STORAGE_PREFIX}admin_demo_session`,
+  SAVED_ADDRESSES: `${STORAGE_PREFIX}saved_addresses`,
+  NEWSLETTER_SUBSCRIBERS: `${STORAGE_PREFIX}newsletter_subscribers`,
+  PRODUCT_REVIEWS: `${STORAGE_PREFIX}product_reviews`,
   SEEDED_FLAG: `${STORAGE_PREFIX}seeded`,
 } as const;
 

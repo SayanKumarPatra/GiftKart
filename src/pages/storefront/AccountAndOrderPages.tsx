@@ -20,9 +20,9 @@ export function CustomerAccountPage() {
   const { pushToast } = useToast();
 
   const [fullName, setFullName] = useState('Ananya Chatterjee');
-  const [email, setEmail] = useState('ananya.chatterjee@example.in');
-  const [phone, setPhone] = useState('9832144510');
-  const [defaultCity, setDefaultCity] = useState('Durgapur');
+  const [email, setEmail] = useState('demo@giftkart.in');
+  const [phone, setPhone] = useState('9382040746');
+  const [defaultCity, setDefaultCity] = useState('Jalchak');
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -74,7 +74,7 @@ export function CustomerAccountPage() {
             </Button>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               to="/my-orders"
               className="rounded-2xl border border-[#EBD8FF] bg-[#F8F2FF] p-4 text-center text-xs font-bold text-[#6A11CB] hover:bg-[#EBD8FF]/70"
@@ -82,14 +82,20 @@ export function CustomerAccountPage() {
               My Demo Orders →
             </Link>
             <Link
-              to="/wishlist"
+              to="/addresses"
               className="rounded-2xl border border-[#EBD8FF] bg-[#FFF0F6] p-4 text-center text-xs font-bold text-[#FF4D8D] hover:bg-[#FF4D8D]/15"
+            >
+              Saved Addresses →
+            </Link>
+            <Link
+              to="/wishlist"
+              className="rounded-2xl border border-[#EBD8FF] bg-[#F8F2FF] p-4 text-center text-xs font-bold text-[#6A11CB] hover:bg-[#EBD8FF]/70"
             >
               Saved Wishlist →
             </Link>
             <Link
               to="/track-order"
-              className="rounded-2xl border border-[#EBD8FF] bg-[#F8F2FF] p-4 text-center text-xs font-bold text-[#2B0B4E] hover:bg-[#EBD8FF]/70"
+              className="rounded-2xl border border-[#EBD8FF] bg-[#FAF6FF] p-4 text-center text-xs font-bold text-[#2B0B4E] hover:bg-[#EBD8FF]/70"
             >
               Track Order →
             </Link>
@@ -141,8 +147,7 @@ export function CustomerAccountPage() {
                   onChange={(e) => setDefaultCity(e.target.value)}
                   className="mt-1 w-full rounded-xl border border-[#EBD8FF] bg-white px-3.5 py-2.5 text-sm focus:border-[#6A11CB] focus:outline-none"
                 >
-                  <option value="Durgapur">Durgapur</option>
-                  <option value="Kolkata">Kolkata</option>
+                  <option value="Jalchak">Jalchak</option>
                 </select>
               </div>
             </div>
@@ -229,12 +234,20 @@ export function MyOrdersPage() {
                     </span>
                   )}
                 </div>
-                <Link
-                  to={`/track-order?order=${order.orderNumber}`}
-                  className="font-bold text-[#6A11CB] hover:text-[#FF4D8D]"
-                >
-                  View Status Timeline →
-                </Link>
+                <div className="flex items-center gap-4">
+                  <Link
+                    to={`/order/${order.orderNumber}`}
+                    className="font-bold text-[#6A11CB] hover:text-[#FF4D8D]"
+                  >
+                    Order Details →
+                  </Link>
+                  <Link
+                    to={`/track-order?order=${order.orderNumber}`}
+                    className="font-semibold text-[#594A6B] hover:text-[#6A11CB]"
+                  >
+                    Track Status
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

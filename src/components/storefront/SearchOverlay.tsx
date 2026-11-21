@@ -134,7 +134,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#EBD8FF]/80 pt-3 text-xs text-[#5F4B78]">
-          <span>Serving Durgapur &amp; Kolkata · All prices in INR (₹)</span>
+          <span>Serving Jalchak · All prices in INR (₹)</span>
           <Link
             to={query.trim() ? `/search?search=${encodeURIComponent(query.trim())}` : '/search'}
             onClick={onClose}

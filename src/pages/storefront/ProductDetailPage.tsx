@@ -458,7 +458,7 @@ export function ProductDetailPage() {
           <div className="flex flex-wrap items-center gap-4 border-t border-[#EBD8FF] pt-4 text-xs text-[#594A6B]">
             <span className="inline-flex items-center gap-1.5 font-semibold text-[#2B0B4E]">
               <MapPin className="h-4 w-4 text-[#FF4D8D]" />
-              Delivers to: {activeZones.map((z) => z.name).join(' & ') || 'Durgapur & Kolkata'}
+              Delivers to: {activeZones.map((z) => z.name).join(' & ') || 'Jalchak'}
             </span>
             <span>In Stock ({product.stockCount} available)</span>
           </div>

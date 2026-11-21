@@ -19,6 +19,10 @@ import {
   LocalAdminAuthService,
   LocalCustomerAuthService,
 } from './local/localAuthServices';
+import {
+  LocalCommunityDataService,
+  type ICommunityDataService,
+} from './local/localCommunityService';
 import { CashfreePlaceholderAdapter } from './integrations/cashfree.interface';
 import { supabasePlaceholderAdapter } from './integrations/supabase.interface';
 import {
@@ -47,6 +51,7 @@ export interface GiftKartServices {
   whatsapp: IWhatsAppNotificationService;
   email: IEmailNotificationService;
   analytics: IAnalyticsService;
+  community: ICommunityDataService;
 }
 
 export const services: GiftKartServices = {
@@ -62,4 +67,5 @@ export const services: GiftKartServices = {
   whatsapp: whatsappPlaceholderAdapter,
   email: emailPlaceholderAdapter,
   analytics: analyticsPlaceholderAdapter,
+  community: new LocalCommunityDataService(),
 };

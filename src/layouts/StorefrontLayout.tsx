@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { AnnouncementBar } from '../components/storefront/AnnouncementBar';
 import { DesktopHeader } from '../components/storefront/DesktopHeader';
 import { MobileHeader } from '../components/storefront/MobileHeader';
 import { MobileBottomNav } from '../components/storefront/MobileBottomNav';
@@ -13,7 +14,8 @@ export function StorefrontLayout() {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-white">
+      <AnnouncementBar />
       <DesktopHeader onOpenSearch={() => setSearchOpen(true)} />
       <MobileHeader onOpenSearch={() => setSearchOpen(true)} />
 
@@ -21,7 +23,7 @@ export function StorefrontLayout() {
         className={
           isHome
             ? 'w-full flex-1'
-            : 'mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8'
+            : 'mx-auto w-full max-w-7xl flex-1 px-3.5 py-4 sm:px-6 sm:py-5'
         }
       >
         <Outlet />

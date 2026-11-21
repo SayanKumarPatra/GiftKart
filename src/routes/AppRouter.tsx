@@ -21,6 +21,11 @@ import {
   TrackOrderPage,
 } from '../pages/storefront/AccountAndOrderPages';
 import {
+  CustomizationGuidePage,
+  OrderDetailsPage,
+  SavedAddressesPage,
+} from '../pages/storefront/CustomerExtraPages';
+import {
   AboutUsPage,
   ContactUsPage,
   FaqPage,
@@ -43,6 +48,11 @@ import {
   AdminReportsPage,
   AdminSettingsPage,
 } from '../pages/admin/AdminOperationsPages';
+import {
+  AdminCustomizationRequestsPage,
+  AdminReviewsPage,
+  AdminWebsitePagesPage,
+} from '../pages/admin/AdminExtraPages';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
 
@@ -68,7 +78,7 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Customer Storefront Shell */}
+        {/* Public Customer Storefront Shell — All 24 Customer Routes */}
         <Route path="/" element={<StorefrontLayout />}>
           <Route index element={<HomePage />} />
           <Route path="shop" element={<ShopPage />} />
@@ -85,9 +95,12 @@ export function AppRouter() {
             path="order-confirmation/:orderNumber"
             element={<OrderConfirmationPage />}
           />
+          <Route path="order/:orderNumber" element={<OrderDetailsPage />} />
+          <Route path="addresses" element={<SavedAddressesPage />} />
           <Route path="account" element={<CustomerAccountPage />} />
           <Route path="my-orders" element={<MyOrdersPage />} />
           <Route path="track-order" element={<TrackOrderPage />} />
+          <Route path="customization-guide" element={<CustomizationGuidePage />} />
           <Route path="about" element={<AboutUsPage />} />
           <Route path="contact" element={<ContactUsPage />} />
           <Route path="faq" element={<FaqPage />} />
@@ -100,6 +113,10 @@ export function AppRouter() {
             element={<PolicyPage type="return" />}
           />
           <Route
+            path="cancellation-policy"
+            element={<PolicyPage type="cancellation" />}
+          />
+          <Route
             path="privacy-policy"
             element={<PolicyPage type="privacy" />}
           />
@@ -107,7 +124,7 @@ export function AppRouter() {
           <Route path="*" element={<NotFoundView />} />
         </Route>
 
-        {/* Isolated Single Admin Web Panel (/admin) */}
+        {/* Isolated Single Admin Web Panel (/admin) — All 15 Admin Routes */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route
           path="/admin"
@@ -120,13 +137,19 @@ export function AppRouter() {
           <Route index element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
-          <Route path="banners" element={<AdminBannersPage />} />
-          <Route path="inventory" element={<AdminInventoryPage />} />
-          <Route path="gift-wrapping" element={<AdminGiftWrappingPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
-          <Route path="coupons" element={<AdminCouponsPage />} />
           <Route path="customers" element={<AdminCustomersPage />} />
+          <Route path="inventory" element={<AdminInventoryPage />} />
+          <Route
+            path="customization-requests"
+            element={<AdminCustomizationRequestsPage />}
+          />
+          <Route path="gift-wrapping" element={<AdminGiftWrappingPage />} />
+          <Route path="banners" element={<AdminBannersPage />} />
+          <Route path="coupons" element={<AdminCouponsPage />} />
+          <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="reports" element={<AdminReportsPage />} />
+          <Route path="pages" element={<AdminWebsitePagesPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="integrations" element={<AdminIntegrationsPage />} />
         </Route>

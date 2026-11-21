@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   CheckCircle2,
   Gift,
+  MapPin,
   Minus,
   Plus,
   ShieldAlert,
@@ -13,7 +14,11 @@ import {
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { useGiftWrapConfig, useStoreSettings } from '../../hooks/useStoreData';
+import {
+  useGiftWrapConfig,
+  useSavedAddresses,
+  useStoreSettings,
+} from '../../hooks/useStoreData';
 import { services } from '../../services/registry';
 import type { DemoOrder } from '../../types';
 import { formatDateTime, formatInr } from '../../utils/format';
@@ -351,7 +356,7 @@ export function CartPage() {
           </Link>
 
           <p className="text-center text-[11px] text-[#6E5B85]">
-            Demo Order Placement only · Delivery calculated for Durgapur &amp; Kolkata at checkout.
+            Demo Order Placement only · Delivery calculated for Jalchak at checkout.
           </p>
         </div>
       </div>
@@ -363,6 +368,7 @@ export function CheckoutPage() {
   const { items, giftWrap, subtotalInr, giftWrapChargeInr, clearCart } = useCart();
   const { customerAccount } = useAuth();
   const { data: settings } = useStoreSettings();
+  const { data: savedAddresses } = useSavedAddresses();
   const { pushToast } = useToast();
   const navigate = useNavigate();
 
@@ -520,11 +526,63 @@ export function CheckoutPage() {
 
       <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
         <div className="space-y-5 lg:col-span-7">
-          {/* Customer & Durgapur/Kolkata Delivery Address */}
+          {/* Customer & Jalchak Delivery Address */}
           <div className="gk-card space-y-4 rounded-3xl p-6">
-            <h2 className="text-lg font-extrabold text-[#3B0764]">
-              Delivery Details (Durgapur &amp; Kolkata)
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-lg font-extrabold text-[#3B0764]">
+                Delivery Details (Jalchak)
+              </h2>
+              <Link
+                to="/addresses"
+                className="text-xs font-bold text-[#6A11CB] hover:text-[#FF4D8D]"
+              >
+                Manage Saved Addresses →
+              </Link>
+            </div>
+
+            {savedAddresses.length > 0 && (
+              <div className="rounded-2xl border border-[#EBD8FF] bg-[#FAF5FF] p-3.5">
+                <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#6A11CB]">
+                  <MapPin className="h-3.5 w-3.5 text-[#FF4D8D]" />
+                  <span>Quick-Fill Saved Address (Local Demo)</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {savedAddresses.map((addr) => (
+                    <button
+                      key={addr.id}
+                      type="button"
+                      onClick={() => {
+                        setFullName(addr.fullName);
+                        setPhone(addr.phone);
+                        if (addr.email) setEmail(addr.email);
+                        setAddressLine1(addr.addressLine1);
+                        setAddressLine2(addr.area ?? '');
+                        setPincode(addr.pincode);
+                        const matchedZone = activeZones.find(
+                          (z) =>
+                            z.id === addr.deliveryZoneId ||
+                            z.name.toLowerCase() === addr.city.toLowerCase()
+                        );
+                        if (matchedZone) {
+                          setDeliveryZoneId(matchedZone.id);
+                        }
+                        pushToast({
+                          title: `Filled "${addr.label}" Address`,
+                          description: `${addr.city} — ${addr.pincode}`,
+                          variant: 'info',
+                        });
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#6A11CB]/25 bg-white px-3 py-1.5 text-xs font-bold text-[#3B0764] transition hover:border-[#FF4D8D] hover:text-[#FF4D8D]"
+                    >
+                      <span>{addr.label}</span>
+                      <span className="text-[10px] font-semibold text-[#6E5B85]">
+                        ({addr.city})
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -548,7 +606,7 @@ export function CheckoutPage() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="98300 00142"
+                  placeholder="9382040746"
                   className="mt-1 w-full rounded-xl border border-[#EBD8FF] bg-white px-3.5 py-2.5 text-sm focus:border-[#6A11CB] focus:outline-none"
                 />
                 {formErrors.phone && (

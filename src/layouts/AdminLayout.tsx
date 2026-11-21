@@ -4,13 +4,16 @@ import {
   BarChart3,
   Boxes,
   ExternalLink,
+  FileText,
   FolderTree,
   Gift,
   Image as ImageIcon,
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquare,
   Package,
+  PencilLine,
   Plug,
   Settings,
   ShoppingCart,
@@ -24,11 +27,17 @@ import { useToast } from '../context/ToastContext';
 
 const ADMIN_NAV_GROUPS = [
   {
-    heading: 'Overview',
+    heading: 'Overview & Orders',
     items: [
       { label: 'Dashboard', to: '/admin', end: true, icon: LayoutDashboard },
       { label: 'Orders', to: '/admin/orders', end: false, icon: ShoppingCart },
       { label: 'Customers', to: '/admin/customers', end: false, icon: Users },
+      {
+        label: 'Customization Requests',
+        to: '/admin/customization-requests',
+        end: false,
+        icon: PencilLine,
+      },
       { label: 'Reports', to: '/admin/reports', end: false, icon: BarChart3 },
     ],
   },
@@ -38,14 +47,16 @@ const ADMIN_NAV_GROUPS = [
       { label: 'Products', to: '/admin/products', end: false, icon: Package },
       { label: 'Categories', to: '/admin/categories', end: false, icon: FolderTree },
       { label: 'Inventory', to: '/admin/inventory', end: false, icon: Boxes },
-      { label: 'Banners', to: '/admin/banners', end: false, icon: ImageIcon },
       { label: 'Gift Wrapping', to: '/admin/gift-wrapping', end: false, icon: Gift },
-      { label: 'Coupons & Offers', to: '/admin/coupons', end: false, icon: Tag },
+      { label: 'Banners', to: '/admin/banners', end: false, icon: ImageIcon },
+      { label: 'Offers & Coupons', to: '/admin/coupons', end: false, icon: Tag },
+      { label: 'Reviews', to: '/admin/reviews', end: false, icon: MessageSquare },
     ],
   },
   {
-    heading: 'System',
+    heading: 'Website & System',
     items: [
+      { label: 'Website Pages', to: '/admin/pages', end: false, icon: FileText },
       { label: 'Store Settings', to: '/admin/settings', end: false, icon: Settings },
       { label: 'Integrations', to: '/admin/integrations', end: false, icon: Plug },
     ],
@@ -56,13 +67,16 @@ const ROUTE_TITLES: Record<string, string> = {
   '/admin': 'Dashboard Overview',
   '/admin/products': 'Products Management',
   '/admin/categories': 'Categories & Subcategories (15 Official)',
-  '/admin/banners': 'Homepage Hero Banners',
-  '/admin/inventory': 'Inventory & Stock Control',
-  '/admin/gift-wrapping': 'Gift Wrapping Settings',
   '/admin/orders': 'Demo Orders & Status History',
-  '/admin/coupons': 'Coupons & Offers',
   '/admin/customers': 'Customer Records (Demo)',
+  '/admin/inventory': 'Inventory & Stock Control',
+  '/admin/customization-requests': 'Customization Requests Queue',
+  '/admin/gift-wrapping': 'Gift Wrapping Settings',
+  '/admin/banners': 'Homepage Hero Banners',
+  '/admin/coupons': 'Offers & Coupons',
+  '/admin/reviews': 'Reviews Moderation (Sample)',
   '/admin/reports': 'Store Analytics & Reports',
+  '/admin/pages': 'Website Pages & Asset Manifest',
   '/admin/settings': 'Store Settings & Delivery Zones',
   '/admin/integrations': 'Future Integrations Readiness',
 };
@@ -92,7 +106,7 @@ export function AdminLayout() {
 
   const sidebarContent = (
     <div className="flex h-full flex-col bg-white">
-      <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#EBD8FF] px-5">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#EBD8FF] px-4">
         <Link to="/admin" className="flex items-center gap-2">
           <BrandLogo size="sm" showTagline={false} />
           <span className="rounded-lg bg-[#F4EBFF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#6A11CB]">
@@ -127,7 +141,7 @@ export function AdminLayout() {
                     to={item.to}
                     end={item.end}
                     className={({ isActive }) =>
-                      `flex min-h-[40px] items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-all whitespace-nowrap ${
+                      `flex min-h-[38px] items-center gap-2.5 rounded-xl px-3 text-xs font-semibold transition-all whitespace-nowrap ${
                         isActive
                           ? 'bg-[#EBD8FF]/75 text-[#6A11CB] shadow-xs ring-1 ring-[#6A11CB]/15'
                           : 'text-[#5F4B78] hover:bg-[#FAF6FF] hover:text-[#2A0E4D]'
@@ -141,7 +155,7 @@ export function AdminLayout() {
                             isActive ? 'text-[#FF4D8D]' : 'text-[#8C75A8]'
                           }`}
                         />
-                        <span>{item.label}</span>
+                        <span className="truncate">{item.label}</span>
                       </>
                     )}
                   </NavLink>
@@ -171,7 +185,7 @@ export function AdminLayout() {
         <button
           type="button"
           onClick={() => void handleSignOut()}
-          className="flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-[#EBD8FF] bg-white px-3 text-xs font-semibold text-[#5F4B78] transition-colors hover:border-[#FF4D8D]/40 hover:bg-[#FFF0F6] hover:text-[#FF4D8D]"
+          className="flex min-h-[38px] w-full items-center justify-center gap-2 rounded-xl border border-[#EBD8FF] bg-white px-3 text-xs font-semibold text-[#5F4B78] transition-colors hover:border-[#FF4D8D]/40 hover:bg-[#FFF0F6] hover:text-[#FF4D8D]"
         >
           <LogOut className="h-4 w-4" />
           <span>Sign Out Demo Admin</span>
@@ -182,7 +196,7 @@ export function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-[#FAF6FF] text-[#2A0E4D]">
-      {/* Desktop Fixed Sidebar (260px) */}
+      {/* Desktop Fixed Sidebar */}
       <aside className="hidden w-[264px] shrink-0 border-r border-[#EBD8FF] bg-white lg:block">
         <div className="sticky top-0 h-screen">{sidebarContent}</div>
       </aside>
@@ -228,7 +242,7 @@ export function AdminLayout() {
 
           <div className="flex shrink-0 items-center gap-2.5">
             <span className="hidden rounded-full border border-[#EBD8FF] bg-[#FAF6FF] px-3 py-1 text-xs font-semibold text-[#6A11CB] sm:inline-flex">
-              Durgapur &amp; Kolkata · INR (₹)
+              Jalchak · INR (₹)
             </span>
             <Link
               to="/"

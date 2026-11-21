@@ -5,9 +5,11 @@ import type {
   GiftWrapConfig,
   HeroSlide,
   Product,
+  ProductReview,
+  SavedAddress,
   StoreSettings,
 } from '../types';
-import { STUDIO_MEDIA } from '../config/appConfig';
+import { HERO_BANNERS, STUDIO_MEDIA } from '../config/appConfig';
 import { STORAGE_KEYS, readStorage, writeStorage } from '../storage/localStorageEngine';
 
 const SEED_TIMESTAMP = '2026-11-15T10:00:00.000Z';
@@ -85,7 +87,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'gift-bag',
     name: 'Gift Bag',
     description: 'Boutique textured paper and ribbon-handle gift bags in festive finishes.',
-    imageUrl: STUDIO_MEDIA.giftBox,
+    imageUrl: STUDIO_MEDIA.giftBag,
     sortOrder: 5,
     isActive: true,
     subcategories: [],
@@ -95,7 +97,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'handmade-gift',
     name: 'Handmade Gift',
     description: 'Artisan explosion boxes, scrapbook albums, and hand-painted keepsakes.',
-    imageUrl: STUDIO_MEDIA.giftBox,
+    imageUrl: STUDIO_MEDIA.handmadeGift,
     sortOrder: 6,
     isActive: true,
     subcategories: [],
@@ -105,7 +107,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'keychain',
     name: 'Keychain',
     description: 'Engraved metal, acrylic photo, and wooden monogram keychains.',
-    imageUrl: STUDIO_MEDIA.cushionKeychain,
+    imageUrl: STUDIO_MEDIA.keychain,
     sortOrder: 7,
     isActive: true,
     subcategories: [],
@@ -135,7 +137,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'personalized-accessories',
     name: 'Personalized Accessories',
     description: 'Name-engraved wallets, passport covers, desk trays, and personalized charms.',
-    imageUrl: STUDIO_MEDIA.stationeryDecor,
+    imageUrl: STUDIO_MEDIA.personalizedAccessories,
     sortOrder: 10,
     isActive: true,
     subcategories: [],
@@ -145,7 +147,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'home-decor-gifts',
     name: 'Home Decor Gifts',
     description: 'Custom wooden wall clocks, tabletop nameplates, and desk decor accents.',
-    imageUrl: STUDIO_MEDIA.photoFrame,
+    imageUrl: STUDIO_MEDIA.homeDecor,
     sortOrder: 11,
     isActive: true,
     subcategories: [],
@@ -165,7 +167,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'couple-friendship-gifts',
     name: 'Couple & Friendship Gifts',
     description: 'Matching keepsake sets, twin mugs, and milestone gifts for partners and best friends.',
-    imageUrl: STUDIO_MEDIA.heroPersonalized,
+    imageUrl: STUDIO_MEDIA.coupleFriendship,
     sortOrder: 13,
     isActive: true,
     subcategories: [],
@@ -175,7 +177,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'customized-photo-gifts',
     name: 'Customized Photo Gifts',
     description: 'Polaroid kits, photo slates, acrylic LED plaques, and custom photo keepsakes.',
-    imageUrl: STUDIO_MEDIA.heroPersonalized,
+    imageUrl: STUDIO_MEDIA.customizedPhotoGifts,
     sortOrder: 14,
     isActive: true,
     subcategories: [],
@@ -185,7 +187,7 @@ export const SEED_CATEGORIES: Category[] = [
     slug: 'special-occasion-gifts',
     name: 'Special Occasion Gifts',
     description: 'Thoughtful celebration editions crafted for birthdays, weddings, anniversaries, and festivals.',
-    imageUrl: STUDIO_MEDIA.giftBox,
+    imageUrl: STUDIO_MEDIA.specialOccasionGifts,
     sortOrder: 15,
     isActive: true,
     subcategories: [],
@@ -285,7 +287,7 @@ export const SEED_PRODUCTS: Product[] = [
     sku: 'GK-TSH-CP03',
     name: 'Couple T-Shirt Print (Set of 2)',
     shortDescription: 'Matching 220 GSM bio-washed white cotton couple T-shirts with custom chest print.',
-    description: 'Soft, breathable combed cotton couple T-shirt pair finished with vibrant wash-resistant DTF artwork. Tailored comfortably for Kolkata and Durgapur weather.',
+    description: 'Soft, breathable combed cotton couple T-shirt pair finished with vibrant wash-resistant DTF artwork. Tailored comfortably for Jalchak weather.',
     priceInr: 799,
     compareAtPriceInr: 1199,
     categoryId: 'cat-tshirt-print',
@@ -519,59 +521,60 @@ export const SEED_PRODUCTS: Product[] = [
 export const SEED_HERO_SLIDES: HeroSlide[] = [
   {
     id: 'slide-personalized',
-    titlePrefix: 'Personalized Gifts for Every',
-    titleHighlight: 'Special Moment',
-    subtitle: 'Custom Gifts • Unique Designs • Made with Love for Durgapur & Kolkata',
+    titlePrefix: 'Make Every Gift',
+    titleHighlight: 'Special',
+    subtitle: 'Custom Mugs • Printed T-Shirts • Photo Frames & More for Jalchak',
     ctaLabel: 'Shop Now',
     ctaHref: '/shop',
-    imageUrl: STUDIO_MEDIA.heroPersonalized,
+    imageUrl: HERO_BANNERS.personalized,
     occasionTag: 'Special Occasion',
     isActive: true,
     sortOrder: 1,
   },
   {
     id: 'slide-birthday',
-    titlePrefix: 'Make Every Birthday',
-    titleHighlight: 'Unforgettable',
-    subtitle: 'Magic Photo Mugs • Oversized Printed Tees • Boutique Gift Wrapping',
+    titlePrefix: 'Find the Perfect',
+    titleHighlight: 'Birthday Gift',
+    subtitle: 'Personalized Gifts • Custom Prints • Photo Frames & Boutique Wrapping',
     ctaLabel: 'Shop Birthday Gifts',
     ctaHref: '/shop?occasion=Birthday',
-    imageUrl: STUDIO_MEDIA.coffeeMug,
+    imageUrl: HERO_BANNERS.birthday,
     occasionTag: 'Birthday',
     isActive: true,
     sortOrder: 2,
   },
   {
     id: 'slide-anniversary',
-    titlePrefix: 'Celebrate Love with',
-    titleHighlight: 'Glowing Memories',
-    subtitle: '3D LED Heart Photo Lamps • Couple T-Shirts • Engraved Keepsakes',
-    ctaLabel: 'Shop Anniversary',
+    titlePrefix: 'Make Your Anniversary',
+    titleHighlight: 'More Special',
+    subtitle: 'Personalized Gifts • Couple Gifts • 3D LED Heart Photo Lamps & Cushions',
+    ctaLabel: 'Shop Anniversary Gifts',
     ctaHref: '/shop?occasion=Anniversary',
-    imageUrl: STUDIO_MEDIA.ledLamp,
+    imageUrl: HERO_BANNERS.anniversary,
     occasionTag: 'Anniversary',
     isActive: true,
     sortOrder: 3,
   },
   {
     id: 'slide-photo-gifts',
-    titlePrefix: 'Frame Stories That',
-    titleHighlight: 'Last Forever',
-    subtitle: 'Collage Frames • Stone Print • Crystal, Wooden & Acrylic Photo Frames',
-    ctaLabel: 'Explore Photo Frames',
-    ctaHref: '/shop?category=photo-frame',
-    imageUrl: STUDIO_MEDIA.photoFrame,
+    titlePrefix: 'Customized',
+    titleHighlight: 'Photo Gifts',
+    subtitle: 'Turn Your Cherished Memories into Photo Frames, Mugs, Cushions & LED Lamps',
+    ctaLabel: 'Create Your Photo Gift',
+    ctaHref: '/shop?category=customized-photo-gifts',
+    imageUrl: HERO_BANNERS.photoGifts,
+    occasionTag: 'Couple',
     isActive: true,
     sortOrder: 4,
   },
   {
     id: 'slide-special-occasion',
-    titlePrefix: 'Wrapped with Care for',
-    titleHighlight: 'Special Occasions',
-    subtitle: 'Luxury Gift Boxes • Handmade Surprises • Custom Ribbon & Message Cards',
-    ctaLabel: 'Explore Gift Boxes',
-    ctaHref: '/shop?category=gift-box',
-    imageUrl: STUDIO_MEDIA.giftBox,
+    titlePrefix: 'Gifts for Every',
+    titleHighlight: 'Special Occasion',
+    subtitle: 'Thoughtful • Personalized • Memorable Surprises for Birthdays, Festivals & Milestones',
+    ctaLabel: 'Explore All Occasions',
+    ctaHref: '/shop?occasion=Special%20Occasion',
+    imageUrl: HERO_BANNERS.specialOccasion,
     occasionTag: 'Festival',
     isActive: true,
     sortOrder: 5,
@@ -623,7 +626,7 @@ export const SEED_GIFT_WRAP_CONFIG: GiftWrapConfig = {
 };
 
 /**
- * Initial launch delivery zones strictly limited to Durgapur and Kolkata ONLY.
+ * Initial launch delivery zone strictly limited to Jalchak ONLY.
  * Admin-editable in Store Settings.
  */
 export const SEED_STORE_SETTINGS: StoreSettings = {
@@ -631,37 +634,51 @@ export const SEED_STORE_SETTINGS: StoreSettings = {
   tagline: 'Har Gift Mein Ek Kahani.',
   currencyCode: 'INR',
   currencySymbol: '₹',
-  supportEmail: 'hello@giftkart.in',
-  supportPhone: '+91 98300 00142',
-  serviceCitiesSummary: 'Durgapur & Kolkata, West Bengal',
+  supportEmail: 'demo@giftkart.in',
+  supportPhone: '+91 9382040746',
+  serviceCitiesSummary: 'Jalchak, West Bengal',
   deliveryZones: [
     {
-      id: 'zone-durgapur',
-      name: 'Durgapur',
+      id: 'zone-jalchak',
+      name: 'Jalchak',
       state: 'West Bengal',
       chargeInr: 49,
       freeDeliveryAboveInr: 999,
       estimatedDays: '1–2 business days',
       isActive: true,
     },
-    {
-      id: 'zone-kolkata',
-      name: 'Kolkata',
-      state: 'West Bengal',
-      chargeInr: 69,
-      freeDeliveryAboveInr: 1199,
-      estimatedDays: '1–3 business days',
-      isActive: true,
-    },
   ],
   banner: {
     enabled: true,
     headline: 'Har Gift Mein Ek Kahani.',
-    subheadline: 'Personalized gifts crafted with love for Durgapur & Kolkata.',
+    subheadline: 'Personalized gifts crafted with love for Jalchak.',
     ctaLabel: 'Shop Now',
     ctaHref: '/shop',
   },
   heroSlides: SEED_HERO_SLIDES,
+  announcement: {
+    enabled: true,
+    desktopText:
+      'Delivery in Jalchak • Customization Available • Demo Orders Only (No COD)',
+    mobileText: 'Serving Jalchak | Demo Orders Only',
+    showSupportLink: true,
+    showTrackOrderLink: true,
+  },
+  newsletter: {
+    enabled: true,
+    heading: 'Stay Connected with GiftKart',
+    description:
+      'Get new personalized gift ideas, seasonal collections, and launch announcements for Jalchak.',
+    buttonLabel: 'Subscribe',
+  },
+  pageContent: {
+    aboutHeadline: 'Har Gift Mein Ek Kahani.',
+    aboutStory:
+      'GiftKart is an online personalized gift and accessories storefront crafted for Jalchak, West Bengal. Every mug, T-shirt print, illuminated photo frame, and boutique gift hamper is prepared with attention to personal memories.',
+    customizationHeadline: 'How GiftKart Customization Works',
+    customizationNote:
+      'Select your preferred product variant, add your custom name, date, or dedication note, and attach a clear photo preview. Optional boutique gift wrapping and personal message cards can be configured directly in your Gift Bag.',
+  },
 };
 
 export const SEED_COUPONS: Coupon[] = [
@@ -695,15 +712,15 @@ export const SEED_DEMO_ORDERS: DemoOrder[] = [
     mode: 'DEMO_ORDER',
     customer: {
       fullName: 'Ananya Chatterjee',
-      phone: '+91 98321 44510',
-      email: 'ananya.chatterjee@example.in',
-      addressLine1: '14/B City Centre Phase II',
-      addressLine2: 'Near Junction Mall',
-      deliveryZoneId: 'zone-durgapur',
-      deliveryZoneNameSnapshot: 'Durgapur',
-      city: 'Durgapur',
+      phone: '+91 9382040746',
+      email: 'demo@giftkart.in',
+      addressLine1: 'Main Road, Near Jalchak Bazar',
+      addressLine2: 'Jalchak',
+      deliveryZoneId: 'zone-jalchak',
+      deliveryZoneNameSnapshot: 'Jalchak',
+      city: 'Jalchak',
       state: 'West Bengal',
-      pincode: '713216',
+      pincode: '721155',
     },
     items: [
       {
@@ -766,14 +783,14 @@ export const SEED_DEMO_ORDERS: DemoOrder[] = [
     mode: 'DEMO_ORDER',
     customer: {
       fullName: 'Debanjan Mukherjee',
-      phone: '+91 98304 77821',
-      email: 'debanjan.m@example.in',
-      addressLine1: '42B Salt Lake Sector II, Block CF',
-      deliveryZoneId: 'zone-kolkata',
-      deliveryZoneNameSnapshot: 'Kolkata',
-      city: 'Kolkata',
+      phone: '+91 9382040746',
+      email: 'demo@giftkart.in',
+      addressLine1: 'Station Para, Jalchak Market',
+      deliveryZoneId: 'zone-jalchak',
+      deliveryZoneNameSnapshot: 'Jalchak',
+      city: 'Jalchak',
       state: 'West Bengal',
-      pincode: '700064',
+      pincode: '721155',
     },
     items: [
       {
@@ -787,7 +804,7 @@ export const SEED_DEMO_ORDERS: DemoOrder[] = [
           Capacity: '330 ml Standard',
           'Handle Style': 'Heart Handle',
         },
-        personalizationDetails: 'Print: "Best Sister Ever — Kolkata 2026"',
+        personalizationDetails: 'Print: "Best Sister Ever — Jalchak 2026"',
         imageSnapshot: STUDIO_MEDIA.coffeeMug,
       },
     ],
@@ -819,6 +836,66 @@ export const SEED_DEMO_ORDERS: DemoOrder[] = [
   },
 ];
 
+export const SEED_SAVED_ADDRESSES: SavedAddress[] = [
+  {
+    id: 'addr-jalchak-1',
+    label: 'Home — Jalchak',
+    fullName: 'Ananya Chatterjee',
+    phone: '+91 9382040746',
+    email: 'demo@giftkart.in',
+    addressLine1: 'Main Road, Near Jalchak Bazar',
+    area: 'Jalchak Bazar',
+    deliveryZoneId: 'zone-jalchak',
+    city: 'Jalchak',
+    state: 'West Bengal',
+    pincode: '721155',
+    isDefault: true,
+    createdAt: SEED_TIMESTAMP,
+  },
+  {
+    id: 'addr-jalchak-2',
+    label: 'Office — Jalchak',
+    fullName: 'Rohan Sen',
+    phone: '+91 9382040746',
+    email: 'demo@giftkart.in',
+    addressLine1: 'Station Para, Near Jalchak High School',
+    area: 'Station Para',
+    deliveryZoneId: 'zone-jalchak',
+    city: 'Jalchak',
+    state: 'West Bengal',
+    pincode: '721155',
+    isDefault: false,
+    createdAt: SEED_TIMESTAMP,
+  },
+];
+
+export const SEED_REVIEWS: ProductReview[] = [
+  {
+    id: 'rev-sample-1',
+    productId: 'prod-magic-mug-01',
+    productName: 'Personalized Photo Magic Mug',
+    authorName: 'Sample Reviewer (Jalchak)',
+    rating: 5,
+    comment:
+      'Sample preview entry: Illustrates how verified customer reviews will appear once live store orders and review submissions are connected.',
+    isSampleData: true,
+    isApproved: true,
+    createdAt: SEED_TIMESTAMP,
+  },
+  {
+    id: 'rev-sample-2',
+    productId: 'prod-led-lamp-07',
+    productName: '3D LED Heart Photo Lamp',
+    authorName: 'Sample Reviewer (Jalchak)',
+    rating: 5,
+    comment:
+      'Sample preview entry: Demonstrates warm LED lamp feedback layout and star rating display.',
+    isSampleData: true,
+    isApproved: true,
+    createdAt: SEED_TIMESTAMP,
+  },
+];
+
 export function ensureDemoSeedHydrated(): void {
   const alreadySeeded = readStorage<boolean>(STORAGE_KEYS.SEEDED_FLAG, false);
   if (alreadySeeded) {
@@ -830,6 +907,9 @@ export function ensureDemoSeedHydrated(): void {
   writeStorage(STORAGE_KEYS.STORE_SETTINGS, SEED_STORE_SETTINGS);
   writeStorage(STORAGE_KEYS.COUPONS, SEED_COUPONS);
   writeStorage(STORAGE_KEYS.ORDERS, SEED_DEMO_ORDERS);
+  writeStorage(STORAGE_KEYS.SAVED_ADDRESSES, SEED_SAVED_ADDRESSES);
+  writeStorage(STORAGE_KEYS.PRODUCT_REVIEWS, SEED_REVIEWS);
+  writeStorage(STORAGE_KEYS.NEWSLETTER_SUBSCRIBERS, []);
   writeStorage(STORAGE_KEYS.SEEDED_FLAG, true);
 }
 
@@ -840,5 +920,8 @@ export function resetAllDemoSeedData(): void {
   writeStorage(STORAGE_KEYS.STORE_SETTINGS, SEED_STORE_SETTINGS, 'settings');
   writeStorage(STORAGE_KEYS.COUPONS, SEED_COUPONS, 'coupons');
   writeStorage(STORAGE_KEYS.ORDERS, SEED_DEMO_ORDERS, 'orders');
+  writeStorage(STORAGE_KEYS.SAVED_ADDRESSES, SEED_SAVED_ADDRESSES, 'community');
+  writeStorage(STORAGE_KEYS.PRODUCT_REVIEWS, SEED_REVIEWS, 'community');
+  writeStorage(STORAGE_KEYS.NEWSLETTER_SUBSCRIBERS, [], 'community');
   writeStorage(STORAGE_KEYS.SEEDED_FLAG, true, 'all');
 }

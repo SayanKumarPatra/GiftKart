@@ -1,30 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
-  Briefcase,
-  ChevronLeft,
-  ChevronRight,
+  CheckCircle2,
   Crown,
-  Flame,
   Gem,
-  Gift,
   Headphones,
   Heart,
-  HeartHandshake,
-  PackageCheck,
+  Mail,
   ShieldCheck,
-  Sparkles,
   Truck,
-  Users,
 } from 'lucide-react';
 import { BRAND_ASSETS, OFFICIAL_OCCASIONS } from '../../config/appConfig';
 import { useCategories, useProducts, useStoreSettings } from '../../hooks/useStoreData';
+import { services } from '../../services/registry';
+import { useToast } from '../../context/ToastContext';
 import { ProductCard } from './ProductCard';
 import { ProductImage } from '../ui/ProductImage';
 
 /* -------------------------------------------------------------------------- */
-/* SECTION 2 — HERO SLIDING BANNER                                            */
+/* HERO SLIDING BANNER (PURE SMOOTH SLIDER — NO OVERLAY BUTTONS OR LINKS)     */
 /* -------------------------------------------------------------------------- */
 export function HeroSliderSection() {
   const { data: settings } = useStoreSettings();
@@ -33,147 +28,98 @@ export function HeroSliderSection() {
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [resetTick, setResetTick] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const slideCount = slides.length;
+  const safeIndex = slideCount > 0 ? activeIndex % slideCount : 0;
 
   useEffect(() => {
-    if (slides.length <= 1 || paused) {
-      return;
-    }
+    if (slideCount <= 1) return;
     const timer = window.setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 5500);
+      setActiveIndex((prev) => (prev + 1) % slideCount);
+    }, 3500);
     return () => window.clearInterval(timer);
-  }, [slides.length, paused]);
+  }, [slideCount, resetTick]);
 
-  const current = slides[activeIndex] ?? slides[0];
-
-  if (!current) {
+  if (slideCount === 0) {
     return null;
   }
 
-  const goPrev = () =>
-    setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  const goNext = () => setActiveIndex((prev) => (prev + 1) % slides.length);
+  function jumpToSlide(idx: number) {
+    setActiveIndex(idx);
+    setResetTick((t) => t + 1);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - touchStartX.current;
+    const deltaY = touch.clientY - touchStartY.current;
+
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        jumpToSlide((safeIndex + 1) % slideCount);
+      } else {
+        jumpToSlide((safeIndex - 1 + slideCount) % slideCount);
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }
 
   return (
     <section
-      aria-label="Featured gifting promotions"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      className="gk-hero-gradient relative overflow-hidden border-b border-[#EBD8FF]/80"
+      aria-label="Featured GiftKart sliding banners"
+      className="w-full"
     >
-      {/* Subtle decorative pastel bokeh circles */}
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[#EBD8FF]/70 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-[#FF4D8D]/15 blur-3xl"
-      />
-
-      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:py-14">
-        <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
-          {/* Left Column: Bold Purple Headline + Pink Highlight + Shop Now CTA */}
-          <div className="text-center lg:col-span-6 lg:text-left">
-            <h1 className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#3B0764] sm:text-5xl lg:text-[52px]">
-              {current.titlePrefix}{' '}
-              <span className="relative inline-block text-[#FF4D8D]">
-                {current.titleHighlight}
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 220 14"
-                  className="mx-auto mt-1 h-2.5 w-full max-w-[220px] text-[#FF4D8D] lg:mx-0"
-                  fill="none"
-                >
-                  <path
-                    d="M4 10C58 2.5 148 2.5 216 9.5"
-                    stroke="currentColor"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-            </h1>
-
-            <p className="mt-4 text-sm font-semibold text-[#4B2C70] sm:text-base">
-              {current.subtitle}
-            </p>
-
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-              <Link
-                to={current.ctaHref}
-                className="gk-btn-pink inline-flex min-h-[48px] items-center gap-2 rounded-full px-7 py-3 text-sm font-bold transition-all duration-150"
-              >
-                <span>{current.ctaLabel}</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-
-              <Link
-                to="/customize"
-                className="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-[#EBD8FF] bg-white/85 px-6 py-3 text-sm font-bold text-[#6A11CB] shadow-sm transition-colors hover:bg-white"
-              >
-                <span>Customize Now</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Right Column: Studio Gift Showcase Photography */}
-          <div className="lg:col-span-6">
-            <div className="relative mx-auto max-w-xl">
-              <div className="overflow-hidden rounded-3xl border-4 border-white/85 bg-white shadow-xl shadow-[#6A11CB]/15">
-                <ProductImage
-                  src={current.imageUrl}
-                  alt={`${current.titlePrefix} ${current.titleHighlight}`}
-                  aspectClass="aspect-[4/3]"
-                />
-              </div>
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="relative h-[160px] w-full overflow-hidden sm:h-[220px] md:h-[280px] lg:h-[350px] xl:h-[390px]"
+      >
+        {/* GPU-Accelerated Continuous Horizontal Track (All Slides Pre-Mounted) */}
+        <div
+          className="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
+          style={{ transform: `translate3d(-${safeIndex * 100}%, 0, 0)` }}
+        >
+          {slides.map((slide) => (
+            <div key={slide.id} className="h-full w-full shrink-0">
               <img
-                src={BRAND_ASSETS.giftCartIllustration}
-                alt=""
-                aria-hidden="true"
+                src={slide.imageUrl}
+                alt={`${slide.titlePrefix} ${slide.titleHighlight}`}
+                loading="eager"
+                decoding="async"
+                draggable={false}
                 referrerPolicy="no-referrer"
-                className="pointer-events-none absolute -bottom-5 -left-4 hidden h-20 w-auto object-contain drop-shadow-md sm:block"
+                className="h-full w-full select-none object-cover object-[center_53%]"
               />
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Previous / Next Controls */}
-        {slides.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={goPrev}
-              aria-label="Previous banner slide"
-              className="absolute left-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#6A11CB] shadow-md transition-transform hover:scale-105 hover:bg-white md:flex lg:left-4"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              type="button"
-              onClick={goNext}
-              aria-label="Next banner slide"
-              className="absolute right-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#6A11CB] shadow-md transition-transform hover:scale-105 hover:bg-white md:flex lg:right-4"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </>
-        )}
-
-        {/* Slider Pagination Indicators */}
-        {slides.length > 1 && (
-          <div className="mt-8 flex items-center justify-center gap-2.5">
+        {/* Minimal Slide Indicators Only — Zero Overlay Buttons or Links */}
+        {slideCount > 1 && (
+          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-1 backdrop-blur-sm sm:bottom-3 sm:gap-2 sm:px-3">
             {slides.map((slide, idx) => (
-              <button
+              <span
                 key={slide.id}
-                type="button"
-                onClick={() => setActiveIndex(idx)}
-                aria-label={`Go to slide ${idx + 1}: ${slide.titleHighlight}`}
-                className={`h-2.5 rounded-full transition-all duration-200 ${
-                  idx === activeIndex
-                    ? 'w-7 bg-[#6A11CB]'
-                    : 'w-2.5 bg-[#6A11CB]/25 hover:bg-[#FF4D8D]/60'
+                role="presentation"
+                onClick={() => jumpToSlide(idx)}
+                className={`block cursor-pointer rounded-full transition-all duration-300 ${
+                  idx === safeIndex
+                    ? 'h-1.5 w-5 bg-[#6A11CB] sm:h-2 sm:w-6'
+                    : 'h-1.5 w-1.5 bg-[#6A11CB]/30 hover:bg-[#FF4D8D]/70 sm:h-2 sm:w-2'
                 }`}
               />
             ))}
@@ -185,139 +131,296 @@ export function HeroSliderSection() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SECTION 3 — GIFTS FOR EVERY OCCASION                                       */
+/* GIFTS FOR EVERY OCCASION (BORDERLESS SOFT PASTEL TILES — SWIPE ON MOBILE)  */
 /* -------------------------------------------------------------------------- */
-const OCCASION_ICON_MAP = {
-  Birthday: { Icon: Gift, color: 'text-[#FF4D8D]' },
-  Anniversary: { Icon: Heart, color: 'text-[#FF4D8D]' },
-  Friendship: { Icon: Users, color: 'text-[#6A11CB]' },
-  Couple: { Icon: HeartHandshake, color: 'text-[#FF4D8D]' },
-  Corporate: { Icon: Briefcase, color: 'text-[#6A11CB]' },
-  'Return Gifts': { Icon: PackageCheck, color: 'text-[#FF4D8D]' },
-  Festival: { Icon: Flame, color: 'text-[#FF4D8D]' },
-  'Special Occasion': { Icon: Sparkles, color: 'text-[#6A11CB]' },
-} as const;
+const OCCASION_TILE_GRADIENTS = [
+  'bg-gradient-to-br from-[#F9ECFF] to-[#F0D9FF]',
+  'bg-gradient-to-br from-[#FFF0F6] to-[#FFDCEB]',
+  'bg-gradient-to-br from-[#F5EAFF] to-[#E9D2FF]',
+  'bg-gradient-to-br from-[#FFF2F8] to-[#F9DFF0]',
+  'bg-gradient-to-br from-[#F6EEFF] to-[#EBD8FF]',
+  'bg-gradient-to-br from-[#FFF3F6] to-[#FFE2EE]',
+  'bg-gradient-to-br from-[#F8ECFF] to-[#EED7FF]',
+  'bg-gradient-to-br from-[#FFF0F7] to-[#FADCEB]',
+] as const;
 
 export function OccasionsSection() {
   return (
     <section
       aria-labelledby="occasions-heading"
-      className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-12"
+      className="mx-auto max-w-7xl px-3 py-3 sm:px-5 sm:py-4 lg:px-6 lg:py-5"
     >
-      <div className="flex items-center justify-center gap-4">
-        <span className="hidden h-px flex-1 max-w-[140px] bg-gradient-to-r from-transparent to-[#EBD8FF] sm:block" />
+      <div className="flex items-center justify-between gap-2">
         <h2
           id="occasions-heading"
-          className="flex items-center gap-2 text-center text-2xl font-extrabold tracking-tight text-[#3B0764] sm:text-3xl"
+          className="flex items-center gap-1.5 text-base font-extrabold tracking-tight text-[#2B0B4E] sm:text-2xl"
         >
-          <span>
-            Gifts for Every <span className="text-[#FF4D8D]">Occasion</span>
-          </span>
-          <Heart className="h-6 w-6 text-[#FF4D8D]" strokeWidth={2.2} />
+          <span>Gifts for Every</span>
+          <span className="text-[#FF4D8D]">Occasion</span>
+          <Heart className="h-4 w-4 fill-[#FF4D8D]/20 text-[#FF4D8D] sm:h-5 sm:w-5" />
         </h2>
-        <span className="hidden h-px flex-1 max-w-[140px] bg-gradient-to-l from-transparent to-[#EBD8FF] sm:block" />
+
+        {/* Mobile: Non-clickable swipe cue (tapping does nothing; users swipe with finger) */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none inline-flex shrink-0 select-none items-center gap-0.5 text-[11px] font-bold text-[#6A11CB]/75 lg:hidden"
+        >
+          <span>View All</span>
+          <ArrowRight className="h-3 w-3" />
+        </span>
+
+        {/* Desktop: Interactive View All link */}
+        <Link
+          to="/shop"
+          className="hidden shrink-0 items-center gap-1 text-sm font-bold text-[#6A11CB] transition-colors hover:text-[#FF4D8D] lg:inline-flex"
+        >
+          <span>View All</span>
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
 
-      <div className="mt-7 grid grid-cols-2 gap-3.5 sm:grid-cols-4 lg:grid-cols-8">
-        {OFFICIAL_OCCASIONS.map((occ) => {
-          const entry = OCCASION_ICON_MAP[occ.tag];
-          const Icon = entry.Icon;
-          return (
-            <Link
-              key={occ.id}
-              to={`/shop?occasion=${encodeURIComponent(occ.tag)}`}
-              className="gk-occasion-tile gk-card-hover flex flex-col items-center justify-center rounded-2xl px-3 py-5 text-center"
+      {/* MOBILE & TABLET: Compact Borderless Pastel Squircle Tiles (Finger Swipe Strip) */}
+      <div className="no-scrollbar mt-2.5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-0.5 lg:hidden">
+        {OFFICIAL_OCCASIONS.map((occ, idx) => (
+          <Link
+            key={occ.id}
+            to={`/shop?occasion=${encodeURIComponent(occ.tag)}`}
+            className="group flex w-[74px] shrink-0 snap-start flex-col items-center text-center sm:w-[86px]"
+          >
+            <div
+              className={`flex h-[70px] w-[70px] items-center justify-center overflow-hidden rounded-2xl p-0.5 shadow-xs shadow-[#6A11CB]/8 transition-transform duration-150 group-active:scale-95 sm:h-[82px] sm:w-[82px] sm:p-1 ${
+                OCCASION_TILE_GRADIENTS[idx % OCCASION_TILE_GRADIENTS.length]
+              }`}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-xs">
-                <Icon className={`h-6 w-6 ${entry.color}`} strokeWidth={1.9} />
-              </div>
-              <span className="mt-3 text-xs font-bold leading-snug text-[#2B0B4E]">
-                {occ.label}
-              </span>
-            </Link>
-          );
-        })}
+              <img
+                src={occ.iconUrl}
+                alt={occ.label}
+                loading="eager"
+                referrerPolicy="no-referrer"
+                className="h-full w-full scale-[1.14] object-contain drop-shadow-xs"
+              />
+            </div>
+            <span className="mt-1.5 line-clamp-2 text-[10px] font-bold leading-tight text-[#2B0B4E] group-hover:text-[#6A11CB] sm:text-[11px]">
+              {occ.label}
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      {/* DESKTOP: Clean Borderless Pastel Squircle Row (8 Columns) */}
+      <div className="mt-3.5 hidden grid-cols-8 gap-3 lg:grid">
+        {OFFICIAL_OCCASIONS.map((occ, idx) => (
+          <Link
+            key={occ.id}
+            to={`/shop?occasion=${encodeURIComponent(occ.tag)}`}
+            className="group flex flex-col items-center text-center"
+          >
+            <div
+              className={`flex h-[84px] w-[84px] items-center justify-center overflow-hidden rounded-2xl p-1 shadow-xs shadow-[#6A11CB]/10 transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-md xl:h-[94px] xl:w-[94px] ${
+                OCCASION_TILE_GRADIENTS[idx % OCCASION_TILE_GRADIENTS.length]
+              }`}
+            >
+              <img
+                src={occ.iconUrl}
+                alt={occ.label}
+                loading="eager"
+                referrerPolicy="no-referrer"
+                className="h-full w-full scale-[1.14] object-contain drop-shadow-xs transition-transform duration-200 group-hover:scale-[1.2]"
+              />
+            </div>
+            <span className="mt-2 line-clamp-2 text-xs font-bold leading-snug text-[#2B0B4E] group-hover:text-[#6A11CB]">
+              {occ.label}
+            </span>
+          </Link>
+        ))}
       </div>
     </section>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* SECTION 4 — SHOP BY CATEGORY (OFFICIAL 15 CATEGORIES)                      */
+/* SHOP BY CATEGORY (8x2 REFERENCE GRID + 16TH LAVENDER VIEW ALL CARD)        */
 /* -------------------------------------------------------------------------- */
 export function CategoryShowcaseSection() {
-  const { data: categories } = useCategories();
-  const [showAll, setShowAll] = useState(false);
-
-  const visibleCategories = showAll ? categories : categories.slice(0, 8);
+  const { data: categories, isLoading } = useCategories();
 
   return (
     <section
-      aria-labelledby="category-showcase-heading"
-      className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8"
+      aria-labelledby="categories-heading"
+      className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 sm:pb-7 lg:px-6"
     >
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex items-end justify-between gap-2">
         <div>
           <h2
-            id="category-showcase-heading"
-            className="text-2xl font-extrabold tracking-tight text-[#3B0764] sm:text-3xl"
+            id="categories-heading"
+            className="text-base font-extrabold tracking-tight text-[#2B0B4E] sm:text-2xl"
           >
-            <span className="border-b-[3px] border-[#FF4D8D] pb-1">Shop</span> by Category
+            Shop by Category
           </h2>
+          <div className="mt-1 h-1 w-14 rounded-full bg-gradient-to-r from-[#6A11CB] to-[#FF4D8D] sm:w-16" />
         </div>
+
         <Link
           to="/categories"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-[#6A11CB] transition-colors hover:text-[#FF4D8D]"
+          className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold text-[#6A11CB] transition-colors hover:text-[#FF4D8D] sm:text-sm lg:hidden"
         >
-          <span>View All {categories.length} Categories</span>
-          <ArrowRight className="h-4 w-4" />
+          <span>View All</span>
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
-      <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
-        {visibleCategories.map((cat) => (
-          <Link
-            key={cat.id}
-            to={`/category/${cat.slug}`}
-            className="gk-card gk-card-hover group flex flex-col overflow-hidden rounded-2xl"
-          >
-            <div className="p-2 pb-0">
-              <div className="overflow-hidden rounded-xl bg-gradient-to-b from-[#FFF0F6] to-[#F7ECFF]">
-                <ProductImage
-                  src={cat.imageUrl}
-                  alt={cat.name}
-                  aspectClass="aspect-square"
-                  zoomOnHover
-                />
-              </div>
-            </div>
-            <div className="flex flex-1 flex-col items-center justify-center px-2 py-2.5 text-center">
-              <span className="line-clamp-2 text-xs font-bold leading-snug text-[#2B0B4E] group-hover:text-[#6A11CB]">
-                {cat.name}
+      {isLoading ? (
+        <div className="mt-3 grid grid-cols-3 gap-2.5 sm:grid-cols-5 lg:grid-cols-8">
+          {Array.from({ length: 16 }).map((_, idx) => (
+            <div key={idx} className="h-32 animate-pulse rounded-2xl bg-[#F4EBFF]" />
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* MOBILE & TABLET HORIZONTAL SNAP-SCROLL STRIP (< 1024px) */}
+          <div className="no-scrollbar mt-2.5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1.5 lg:hidden">
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                to={`/category/${cat.slug}`}
+                className="group flex w-[104px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl bg-white text-center shadow-[0_6px_16px_-6px_rgba(106,17,203,0.16)] ring-1 ring-[#EBD8FF]/55 transition-transform duration-150 active:scale-[0.98] sm:w-[118px]"
+              >
+                <div className="h-[76px] w-full overflow-hidden bg-gradient-to-b from-[#FFEAF3] to-[#FFF4F9] sm:h-[86px]">
+                  <ProductImage
+                    src={cat.imageUrl}
+                    alt={cat.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="flex min-h-[38px] flex-1 items-center justify-center bg-white px-1.5 py-1.5 sm:min-h-[42px]">
+                  <span className="line-clamp-2 text-[10.5px] font-extrabold leading-[1.2] text-[#1E1035] group-hover:text-[#6A11CB] sm:text-[11px]">
+                    {cat.name}
+                  </span>
+                </div>
+              </Link>
+            ))}
+
+            {/* 16th Card: View All 15 Categories (Mobile Strip End Tile) */}
+            <Link
+              to="/categories"
+              className="group flex w-[104px] shrink-0 snap-start flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-[#F4E7FF] via-[#F1E0FF] to-[#EBD4FF] p-2.5 text-center shadow-[0_6px_16px_-6px_rgba(106,17,203,0.16)] ring-1 ring-[#EBD8FF]/65 transition-transform duration-150 active:scale-[0.98] sm:w-[118px]"
+            >
+              <span
+                aria-hidden="true"
+                className="mb-2 grid grid-cols-2 gap-1.5"
+              >
+                <span className="h-3.5 w-3.5 rounded-full bg-gradient-to-br from-[#D29EFF] to-[#B76EFF]" />
+                <span className="h-3.5 w-3.5 rounded-full bg-gradient-to-br from-[#D29EFF] to-[#B76EFF]" />
+                <span className="h-3.5 w-3.5 rounded-full bg-gradient-to-br from-[#D29EFF] to-[#B76EFF]" />
+                <span className="h-3.5 w-3.5 rounded-full bg-gradient-to-br from-[#D29EFF] to-[#B76EFF]" />
               </span>
-              {cat.subcategories.length > 0 && (
-                <span className="mt-0.5 text-[10px] font-semibold text-[#FF4D8D]">
-                  {cat.subcategories.length} styles
-                </span>
-              )}
-            </div>
-          </Link>
-        ))}
+              <span className="text-[10.5px] font-extrabold leading-[1.25] text-[#1E1035] group-hover:text-[#6A11CB] sm:text-[11px]">
+                View All
+                <br />
+                {categories.length} Categories
+              </span>
+            </Link>
+          </div>
+
+          {/* DESKTOP 8×2 GRID: ALL 15 OFFICIAL CATEGORIES + 16TH VIEW ALL TILE (>= 1024px) */}
+          <div className="mt-3.5 hidden grid-cols-8 gap-2.5 lg:grid xl:gap-3">
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                to={`/category/${cat.slug}`}
+                className="group flex flex-col overflow-hidden rounded-2xl bg-white text-center shadow-[0_6px_18px_-6px_rgba(106,17,203,0.16)] ring-1 ring-[#EBD8FF]/50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-8px_rgba(106,17,203,0.24)] hover:ring-[#6A11CB]/30"
+              >
+                <div className="h-[80px] w-full overflow-hidden bg-gradient-to-b from-[#FFEAF3] to-[#FFF4F9] xl:h-[90px]">
+                  <ProductImage
+                    src={cat.imageUrl}
+                    alt={cat.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="flex min-h-[42px] flex-1 items-center justify-center bg-white px-1.5 py-2 xl:min-h-[46px]">
+                  <span className="line-clamp-2 text-[11px] font-extrabold leading-[1.2] text-[#1E1035] group-hover:text-[#6A11CB] xl:text-[12px]">
+                    {cat.name}
+                  </span>
+                </div>
+              </Link>
+            ))}
+
+            {/* 16th Card: View All 15 Categories (Soft Lavender Reference Tile) */}
+            <Link
+              to="/categories"
+              className="group flex flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-[#F4E7FF] via-[#F1E0FF] to-[#EBD4FF] p-3 text-center shadow-[0_6px_18px_-6px_rgba(106,17,203,0.16)] ring-1 ring-[#EBD8FF]/65 transition-all duration-200 hover:-translate-y-0.5 hover:from-[#EFE0FF] hover:to-[#E2C2FF] hover:shadow-[0_12px_24px_-8px_rgba(106,17,203,0.24)]"
+            >
+              <span
+                aria-hidden="true"
+                className="mb-2.5 grid grid-cols-2 gap-1.5 transition-transform duration-200 group-hover:scale-105"
+              >
+                <span className="h-4 w-4 rounded-full bg-gradient-to-br from-[#D39EFF] to-[#B76EFF] shadow-2xs xl:h-[18px] xl:w-[18px]" />
+                <span className="h-4 w-4 rounded-full bg-gradient-to-br from-[#D39EFF] to-[#B76EFF] shadow-2xs xl:h-[18px] xl:w-[18px]" />
+                <span className="h-4 w-4 rounded-full bg-gradient-to-br from-[#D39EFF] to-[#B76EFF] shadow-2xs xl:h-[18px] xl:w-[18px]" />
+                <span className="h-4 w-4 rounded-full bg-gradient-to-br from-[#D39EFF] to-[#B76EFF] shadow-2xs xl:h-[18px] xl:w-[18px]" />
+              </span>
+              <span className="text-[11px] font-extrabold leading-[1.25] text-[#1E1035] group-hover:text-[#6A11CB] xl:text-[12px]">
+                View All
+                <br />
+                {categories.length} Categories
+              </span>
+            </Link>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* OUR BEST SELLERS                                                           */
+/* -------------------------------------------------------------------------- */
+export function BestSellersSection() {
+  const { data: products, isLoading } = useProducts({ bestSellersOnly: true });
+
+  return (
+    <section
+      aria-labelledby="bestsellers-heading"
+      className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 sm:pb-7 lg:px-6"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-[#FFF0F6] text-[#FF4D8D] sm:h-8 sm:w-8">
+            <Crown className="h-4 w-4" />
+          </span>
+          <div>
+            <h2
+              id="bestsellers-heading"
+              className="text-lg font-extrabold tracking-tight text-[#2B0B4E] sm:text-2xl"
+            >
+              Our Best Sellers
+            </h2>
+            <p className="text-[11px] font-medium text-[#7B6496]">
+              Demo catalog items · Ratings shown are sample preview data
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to="/best-sellers"
+          className="inline-flex items-center gap-1 text-xs font-bold text-[#6A11CB] transition-colors hover:text-[#FF4D8D] sm:text-sm"
+        >
+          <span>View More</span>
+          <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        </Link>
       </div>
 
-      {categories.length > 8 && (
-        <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            onClick={() => setShowAll((prev) => !prev)}
-            className="inline-flex min-h-[42px] items-center gap-2 rounded-full border border-[#EBD8FF] bg-[#F8F2FF] px-6 py-2 text-xs font-bold text-[#6A11CB] transition-colors hover:bg-[#EBD8FF]/70"
-          >
-            <span>
-              {showAll
-                ? 'Show Featured 8 Categories'
-                : `Show All ${categories.length} Official Categories`}
-            </span>
-          </button>
+      {isLoading ? (
+        <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="h-64 animate-pulse rounded-2xl bg-[#F4EBFF]" />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-3.5 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
+          {products.slice(0, 8).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       )}
     </section>
@@ -325,126 +428,206 @@ export function CategoryShowcaseSection() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SECTION 5 — OUR BEST SELLERS                                               */
+/* WHY CHOOSE GIFTKART? (WITH UPLOADED GIFT CART ILLUSTRATION)                */
 /* -------------------------------------------------------------------------- */
-export function BestSellersSection() {
-  const { data: bestSellers } = useProducts({ bestSellersOnly: true });
-  const { data: categories } = useCategories();
-  const catMap = new Map(categories.map((c) => [c.id, c.name]));
+export function WhyChooseGiftKartSection() {
+  const pillars = [
+    {
+      title: 'Unique & Personalized Gifts',
+      subtitle: 'Custom photos, names & gift wrap',
+      Icon: Gem,
+    },
+    {
+      title: 'Delivery in Jalchak',
+      subtitle: 'Dedicated West Bengal zone',
+      Icon: Truck,
+    },
+    {
+      title: 'Reliable Shopping Experience',
+      subtitle: 'Transparent Demo Order snapshots',
+      Icon: ShieldCheck,
+    },
+    {
+      title: 'Customer Support',
+      subtitle: 'Friendly local gift assistance',
+      Icon: Headphones,
+    },
+  ];
 
   return (
     <section
-      aria-labelledby="best-sellers-heading"
-      className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-12"
+      aria-labelledby="why-giftkart-heading"
+      className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 sm:pb-7 lg:px-6"
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2
-          id="best-sellers-heading"
-          className="flex items-center gap-2.5 text-2xl font-extrabold tracking-tight text-[#3B0764] sm:text-3xl"
-        >
-          <Crown className="h-7 w-7 fill-amber-400 text-amber-500" />
-          <span>Our Best Sellers</span>
-        </h2>
+      <div className="gk-why-gradient relative overflow-hidden rounded-2xl border border-[#EBD8FF] px-4 py-5 shadow-sm sm:rounded-3xl sm:px-7 sm:py-6">
+        <div className="grid items-center gap-5 lg:grid-cols-12">
+          <div className="lg:col-span-9">
+            <h2
+              id="why-giftkart-heading"
+              className="flex flex-wrap items-center justify-center gap-1.5 text-center text-xl font-extrabold tracking-tight text-[#2B0B4E] sm:text-2xl lg:justify-start lg:text-left"
+            >
+              <span>Why Choose</span>
+              <span className="text-[#FF4D8D]">GiftKart?</span>
+              <Heart className="h-5 w-5 fill-[#FF4D8D]/20 text-[#FF4D8D]" />
+            </h2>
 
-        <Link
-          to="/best-sellers"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-[#6A11CB] transition-colors hover:text-[#FF4D8D]"
-        >
-          <span>View More</span>
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
+            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3.5">
+              {pillars.map(({ title, subtitle, Icon }) => (
+                <div
+                  key={title}
+                  className="flex flex-col items-center rounded-2xl border border-white/80 bg-white/85 p-3 text-center backdrop-blur-sm sm:p-3.5"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4EBFF] text-[#6A11CB]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-2 text-xs font-extrabold text-[#2B0B4E] sm:text-sm">
+                    {title}
+                  </h3>
+                  <p className="mt-0.5 text-[11px] font-medium leading-snug text-[#594A6B]">
+                    {subtitle}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-      <div className="mt-7 grid grid-cols-1 gap-4 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        {bestSellers.slice(0, 5).map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            categoryLabel={catMap.get(product.categoryId)}
-          />
-        ))}
+          <div className="flex flex-col items-center justify-center lg:col-span-3">
+            <img
+              src={BRAND_ASSETS.giftCartIllustration}
+              alt="GiftKart pink and purple gift delivery cart illustration"
+              referrerPolicy="no-referrer"
+              className="h-28 w-auto max-w-full object-contain drop-shadow-xl sm:h-32 lg:h-36"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* SECTION 6 — WHY CHOOSE GIFTKART (WITH UPLOADED GIFT CART ILLUSTRATION)     */
+/* STAY CONNECTED NEWSLETTER (DEMO LOCAL CAPTURE)                             */
 /* -------------------------------------------------------------------------- */
-export function WhyChooseGiftKartSection() {
-  const pillars = [
-    {
-      Icon: Gem,
-      title: 'Unique & Personalized',
-      subtitle: 'Custom names, photos & boutique gift wrapping',
-    },
-    {
-      Icon: Truck,
-      title: 'Durgapur & Kolkata Delivery',
-      subtitle: 'Dedicated dispatch across both launch cities',
-    },
-    {
-      Icon: ShieldCheck,
-      title: 'Transparent Shopping',
-      subtitle: 'Demo Order mode (Cashfree ready — not connected)',
-    },
-    {
-      Icon: Headphones,
-      title: 'Dedicated Support',
-      subtitle: 'Friendly help for custom gifts & special requests',
-    },
-  ];
+export function NewsletterSection() {
+  const { data: settings } = useStoreSettings();
+  const { pushToast } = useToast();
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [subscribedEmail, setSubscribedEmail] = useState<string | null>(null);
+
+  const newsletter = settings?.newsletter;
+  if (newsletter && !newsletter.enabled) {
+    return null;
+  }
+
+  async function handleSubscribe(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    const result = await services.community.subscribeNewsletter(trimmed);
+    setSubscribedEmail(result.subscriber.email);
+    setEmail('');
+    pushToast({
+      title: result.added ? 'Saved to Demo Newsletter List' : 'Already on Demo List',
+      description:
+        'Saved locally in browser storage. No live marketing emails are sent until mailing integration is connected.',
+      variant: 'success',
+    });
+  }
 
   return (
     <section
-      aria-labelledby="why-choose-heading"
-      className="gk-promo-gradient relative mt-6 overflow-hidden border-y border-[#EBD8FF]"
+      aria-labelledby="newsletter-heading"
+      className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 sm:pb-7 lg:px-6"
     >
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-14">
-        <div className="grid items-center gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-9">
-            <h2
-              id="why-choose-heading"
-              className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-[#3B0764] sm:text-3xl"
-            >
-              <span>
-                Why Choose <span className="text-[#FF4D8D]">GiftKart</span>?
-              </span>
-              <Heart className="h-5 w-5 text-[#FF4D8D]" />
-            </h2>
+      <div className="overflow-hidden rounded-2xl border border-[#EBD8FF] bg-gradient-to-r from-[#F6ECFF] via-[#FFF4FA] to-[#FFFFFF] shadow-sm sm:rounded-3xl">
+        <div className="grid items-center gap-4 lg:grid-cols-12">
+          <div className="p-4 sm:p-6 lg:col-span-7">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[#6A11CB] shadow-xs">
+              <Mail className="h-3.5 w-3.5 text-[#FF4D8D]" />
+              <span>Gift Ideas &amp; Collection Updates</span>
+            </span>
 
-            <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {pillars.map((pillar, idx) => {
-                const Icon = pillar.Icon;
-                return (
-                  <div
-                    key={pillar.title}
-                    className={`flex flex-col items-start sm:items-center sm:text-center ${
-                      idx > 0 ? 'lg:border-l lg:border-[#EBD8FF] lg:pl-5' : ''
-                    }`}
-                  >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#6A11CB] shadow-sm shadow-[#6A11CB]/10">
-                      <Icon className="h-6 w-6" strokeWidth={1.85} />
-                    </div>
-                    <h3 className="mt-3 text-sm font-bold text-[#2B0B4E]">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-[#594A6B]">
-                      {pillar.subtitle}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
+            <h2
+              id="newsletter-heading"
+              className="mt-2.5 text-xl font-extrabold tracking-tight text-[#2B0B4E] sm:text-2xl"
+            >
+              {newsletter?.heading ?? 'Stay Connected with GiftKart'}
+            </h2>
+            <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-[#594A6B] sm:text-sm">
+              {newsletter?.description ??
+                'Get new personalized gift ideas, seasonal collections, and launch announcements for Jalchak.'}
+            </p>
+
+            {subscribedEmail ? (
+              <div className="mt-3.5 flex items-start gap-2.5 rounded-2xl border border-[#6A11CB]/25 bg-white p-3.5 text-xs text-[#2B0B4E]">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#6A11CB]" />
+                <div>
+                  <p className="font-bold">
+                    Demo subscription recorded for {subscribedEmail}
+                  </p>
+                  <p className="mt-0.5 text-[#594A6B]">
+                    Stored locally in Demo Mode. Real email delivery will begin only after an email provider integration is connected.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => void handleSubscribe(e)}
+                noValidate
+                className="mt-3.5 flex flex-col gap-2 sm:flex-row"
+              >
+                <label htmlFor="newsletter-email" className="sr-only">
+                  Email address
+                </label>
+                <div className="flex flex-1 items-center gap-2 rounded-full border border-[#EBD8FF] bg-white px-4 py-2 shadow-xs focus-within:border-[#6A11CB]">
+                  <Mail className="h-4 w-4 shrink-0 text-[#6A11CB]" />
+                  <input
+                    id="newsletter-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    placeholder="Enter your email address"
+                    className="w-full bg-transparent text-sm text-[#2B0B4E] placeholder:text-[#7B6496] focus:outline-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="gk-btn-pink inline-flex min-h-[42px] shrink-0 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold"
+                >
+                  <span>{newsletter?.buttonLabel ?? 'Subscribe'}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            )}
+
+            {error && (
+              <p className="mt-1.5 text-xs font-semibold text-rose-600">{error}</p>
+            )}
+
+            <p className="mt-2.5 text-[11px] text-[#7B6496]">
+              Demo capture only — Email Notifications service is currently{' '}
+              <span className="font-semibold text-[#6A11CB]">
+                Integration Ready — Not Connected
+              </span>
+              .
+            </p>
           </div>
 
-          {/* Right: Uploaded Transparent Gift Cart Illustration */}
-          <div className="flex justify-center lg:col-span-3 lg:justify-end">
+          <div className="hidden h-full lg:col-span-5 lg:block">
             <img
-              src={BRAND_ASSETS.giftCartIllustration}
-              alt="GiftKart personalized gift delivery illustration"
+              src={BRAND_ASSETS.newsletterBanner}
+              alt="Stay Connected with GiftKart newsletter illustration"
               referrerPolicy="no-referrer"
-              className="h-40 w-auto object-contain drop-shadow-lg sm:h-48"
+              className="h-full max-h-[235px] w-full object-cover object-right"
             />
           </div>
         </div>

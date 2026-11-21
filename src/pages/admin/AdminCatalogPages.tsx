@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   Sparkles,
   Trash2,
+  Upload,
 } from 'lucide-react';
 import {
   useCategories,
@@ -27,7 +28,7 @@ import {
 } from '../../hooks/useStoreData';
 import { services } from '../../services/registry';
 import { resetAllDemoSeedData } from '../../data/seedData';
-import { OFFICIAL_OCCASIONS, STUDIO_MEDIA } from '../../config/appConfig';
+import { HERO_BANNERS, OFFICIAL_OCCASIONS, STUDIO_MEDIA } from '../../config/appConfig';
 import { useToast } from '../../context/ToastContext';
 import { formatDateTime, formatInr, slugify } from '../../utils/format';
 import type {
@@ -41,14 +42,26 @@ import { Button } from '../../components/ui/Button';
 import { ProductImage } from '../../components/ui/ProductImage';
 
 const MEDIA_OPTIONS: { label: string; url: string }[] = [
-  { label: 'Hero Personalized Gifts', url: STUDIO_MEDIA.heroPersonalized },
+  { label: 'Banner 1 — Personalized Gifts', url: HERO_BANNERS.personalized },
+  { label: 'Banner 2 — Birthday Gifts', url: HERO_BANNERS.birthday },
+  { label: 'Banner 3 — Anniversary Gifts', url: HERO_BANNERS.anniversary },
+  { label: 'Banner 4 — Customized Photo Gifts', url: HERO_BANNERS.photoGifts },
+  { label: 'Banner 5 — Special Occasion Gifts', url: HERO_BANNERS.specialOccasion },
   { label: 'Coffee Mug Studio', url: STUDIO_MEDIA.coffeeMug },
   { label: 'LED Lamp Studio', url: STUDIO_MEDIA.ledLamp },
   { label: 'Photo Frame Studio', url: STUDIO_MEDIA.photoFrame },
   { label: 'T-shirt Print Studio', url: STUDIO_MEDIA.tshirtPrint },
   { label: 'Gift Box Studio', url: STUDIO_MEDIA.giftBox },
-  { label: 'Cushion & Keychain Studio', url: STUDIO_MEDIA.cushionKeychain },
-  { label: 'Stationery & Decor Studio', url: STUDIO_MEDIA.stationeryDecor },
+  { label: 'Gift Bag Studio', url: STUDIO_MEDIA.giftBag },
+  { label: 'Handmade Gift Studio', url: STUDIO_MEDIA.handmadeGift },
+  { label: 'Keychain Studio', url: STUDIO_MEDIA.keychain },
+  { label: 'Cushion Studio', url: STUDIO_MEDIA.cushionKeychain },
+  { label: 'Personalized Accessories Studio', url: STUDIO_MEDIA.personalizedAccessories },
+  { label: 'Home Decor Studio', url: STUDIO_MEDIA.homeDecor },
+  { label: 'Stationery Studio', url: STUDIO_MEDIA.stationeryDecor },
+  { label: 'Couple & Friendship Studio', url: STUDIO_MEDIA.coupleFriendship },
+  { label: 'Customized Photo Gifts Studio', url: STUDIO_MEDIA.customizedPhotoGifts },
+  { label: 'Special Occasion Gifts Studio', url: STUDIO_MEDIA.specialOccasionGifts },
 ];
 
 /* ============================================================================
@@ -86,7 +99,7 @@ export function AdminDashboardPage() {
     pushToast({
       title: 'Demo seed data restored',
       description:
-        'All 15 official categories, exact subcategories, studio products, Durgapur & Kolkata zones, and demo orders were restored.',
+        'All 15 official categories, exact subcategories, studio products, Jalchak delivery zone, and demo orders were restored.',
       variant: 'info',
     });
   }
@@ -102,7 +115,7 @@ export function AdminDashboardPage() {
             GiftKart Store Operations
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-[#F4EBFF]">
-            Manage your 15 official gift categories, exact subcategories, personalized products, hero banners, gift wrapping, and Durgapur &amp; Kolkata demo orders.
+            Manage your 15 official gift categories, exact subcategories, personalized products, hero banners, gift wrapping, and Jalchak demo orders.
           </p>
         </div>
 
@@ -168,7 +181,7 @@ export function AdminDashboardPage() {
             {settings?.deliveryZones.filter((z) => z.isActive).length ?? 0} Zones
           </p>
           <p className="mt-1 text-xs text-[#7B6496]">
-            {settings?.deliveryZones.map((z) => z.name).join(' & ') || 'Durgapur & Kolkata'} ·{' '}
+            {settings?.deliveryZones.map((z) => z.name).join(' & ') || 'Jalchak'} ·{' '}
             {coupons.filter((c) => c.isActive).length} active coupons
           </p>
         </div>
@@ -407,7 +420,7 @@ export function AdminProductsPage() {
         description:
           editingForm.description.trim() ||
           editingForm.shortDescription.trim() ||
-          'Handcrafted personalized gift prepared for Durgapur & Kolkata delivery.',
+          'Handcrafted personalized gift prepared for Jalchak delivery.',
         priceInr: Math.round(price),
         compareAtPriceInr:
           compareAt && compareAt > price ? Math.round(compareAt) : undefined,
@@ -551,19 +564,88 @@ export function AdminProductsPage() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#4A3862]">Studio Photo Preset</label>
-              <select
-                value={editingForm.imageUrl}
-                onChange={(e) => setEditingForm({ ...editingForm, imageUrl: e.target.value })}
-                className="mt-1 w-full rounded-xl border border-[#EBD8FF] bg-white px-3 py-2 text-sm focus:border-[#6A11CB] focus:outline-none"
-              >
-                {MEDIA_OPTIONS.map((m) => (
-                  <option key={m.url} value={m.url}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label className="block text-xs font-semibold text-[#4A3862]">
+                Product Photo (Studio Preset or Local File Upload)
+              </label>
+              <div className="mt-1.5 flex flex-col gap-3 rounded-2xl border border-[#EBD8FF] bg-[#FAF6FF] p-3 sm:flex-row sm:items-center">
+                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-[#EBD8FF] bg-white">
+                  <ProductImage
+                    src={editingForm.imageUrl}
+                    alt={editingForm.name || 'Preview'}
+                    className="h-full w-full"
+                  />
+                </div>
+                <div className="grid flex-1 gap-2.5 sm:grid-cols-2">
+                  <div>
+                    <span className="block text-[11px] font-semibold text-[#6E5B85]">
+                      Choose Studio Photo Preset
+                    </span>
+                    <select
+                      value={
+                        MEDIA_OPTIONS.some((m) => m.url === editingForm.imageUrl)
+                          ? editingForm.imageUrl
+                          : ''
+                      }
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setEditingForm({ ...editingForm, imageUrl: e.target.value });
+                        }
+                      }}
+                      className="mt-1 w-full rounded-xl border border-[#EBD8FF] bg-white px-3 py-2 text-xs focus:border-[#6A11CB] focus:outline-none"
+                    >
+                      {!MEDIA_OPTIONS.some((m) => m.url === editingForm.imageUrl) && (
+                        <option value="">Custom Uploaded Image (Local Preview)</option>
+                      )}
+                      {MEDIA_OPTIONS.map((m) => (
+                        <option key={m.url} value={m.url}>
+                          {m.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <span className="block text-[11px] font-semibold text-[#6E5B85]">
+                      Or Upload Image (Local Demo ≤ 1.5MB)
+                    </span>
+                    <label className="mt-1 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#6A11CB]/40 bg-white px-3 py-2 text-xs font-bold text-[#6A11CB] transition hover:border-[#FF4D8D] hover:text-[#FF4D8D]">
+                      <Upload className="h-3.5 w-3.5" />
+                      <span>Upload Product Photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 1.5 * 1024 * 1024) {
+                            pushToast({
+                              title: 'File Too Large for Demo Storage',
+                              description: 'Please upload an image under 1.5 MB for local demo preview.',
+                              variant: 'error',
+                            });
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            if (typeof reader.result === 'string') {
+                              setEditingForm((prev) =>
+                                prev ? { ...prev, imageUrl: reader.result as string } : prev
+                              );
+                              pushToast({
+                                title: 'Product Photo Loaded',
+                                description: `${file.name} stored locally in browser demo mode.`,
+                                variant: 'success',
+                              });
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>
